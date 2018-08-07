@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"time"
 )
 
 type player struct {
@@ -9,32 +10,67 @@ type player struct {
 	hand   []card
 }
 
+var freshDeck deck
+var remainingCards int
+var numberOfTurns int
+var numberOfCardsDealtTotal int
+var p1 player
+var p2 player
+
 func newGame() {
-	freshDeck := deck.generate(deck{})
 	// var discardedCards []card
-	var remainingCards = len(freshDeck.cards)
-	const cardsDealtEachRound = 7
+	freshDeck = deck.generate(deck{})
+	remainingCards = len(freshDeck.cards)
+	p1 = player{number: 1}
+	p2 = player{number: 2}
 
-	p1 := player{number: 1}
-	p2 := player{number: 2}
+	// Start the game by dealing 7 cards to each player
+	dealHeadToPlayer(p1, 7)
+	dealHeadToPlayer(p2, 7)
 
-	// Deal out the cards
-	for i := 0; i < cardsDealtEachRound; i++ {
-		p1.hand = append(p1.hand, freshDeck.cards[i])
-		println("Player 1 gets", freshDeck.cards[i].friendlyName())
+	// dealHeadToPlayer(p1, 1)
+	fmt.Println(p1.hand)
+	playerPlaysATrick(p1, 4)
+}
+
+func dealHeadToPlayer(p player, numberOfCardsToDeal int) {
+	for i := 0; i < numberOfCardsToDeal; i++ {
+		if numberOfCardsDealtTotal <= 51 {
+			// Add cards from the deck to
+			if p.number == 1 {
+				p1.hand = append(p1.hand, freshDeck.cards[numberOfCardsDealtTotal])
+				fmt.Println(fmt.Sprintf("Player %d gets %s", p1.number, freshDeck.cards[numberOfCardsDealtTotal].friendlyName()))
+			} else {
+				p2.hand = append(p1.hand, freshDeck.cards[numberOfCardsDealtTotal])
+				fmt.Println(fmt.Sprintf("Player %d gets %s", p2.number, freshDeck.cards[numberOfCardsDealtTotal].friendlyName()))
+			}
+
+			// Increment the number of cards dealt
+			numberOfCardsDealtTotal++
+		} else {
+			fmt.Println("There are no more cards that can be dealt")
+		}
 	}
+}
 
-	remainingCards = remainingCards - cardsDealtEachRound
+func playerPlaysATrick(p player, cardInHand int) {
+	// A player lays a card down
+	fmt.Println(fmt.Sprintf("Player %d is playing a trick...", p.number))
+	fmt.Println(fmt.Sprintf("Player %d played %s...", p.number, p.hand[cardInHand].friendlyName()))
+	time.Sleep(1 * time.Second)
+	playerPlaysATrick(getNextPlayer(p), 1)
+}
 
-	// Deal to player 2
-
-	for i := 7; i < cardsDealtEachRound*2; i++ {
-		p2.hand = append(p1.hand, freshDeck.cards[i])
-		println("Player 2 gets", freshDeck.cards[i].friendlyName())
+func getNextPlayer(p player) player {
+	var nextPlayer player
+	if p.number == 1 {
+		nextPlayer = p2
+	} else {
+		nextPlayer = p1
 	}
+	return nextPlayer
+}
 
-	remainingCards = remainingCards - cardsDealtEachRound
-	fmt.Println(remainingCards, "cards remaining")
-
-	fmt.Println("Trumps is", freshDeck.cards[cardsDealtEachRound].suit)
+func pickTrumps() {
+	fmt.Println("Trumps is", freshDeck.cards[numberOfCardsDealtTotal+1].suit)
 }
