@@ -23,6 +23,7 @@ type card struct {
 
 func (card card) friendlyName() string {
 	var cardName string
+	var cardSuitSymbol string
 
 	switch card.rank {
 	case 11:
@@ -37,5 +38,16 @@ func (card card) friendlyName() string {
 		cardName = strconv.Itoa(card.rank)
 	}
 
-	return fmt.Sprintf("The %s of %s", cardName, card.suit)
+	switch card.suit {
+	case "Spades":
+		cardSuitSymbol = "♠"
+	case "Hearts":
+		cardSuitSymbol = "♥"
+	case "Clubs":
+		cardSuitSymbol = "♣"
+	case "Diamonds":
+		cardSuitSymbol = "♦"
+	}
+
+	return fmt.Sprintf("The %s of %s", cardName, cardSuitSymbol)
 }
