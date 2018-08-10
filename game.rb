@@ -40,12 +40,12 @@ def list_hand(player)
 end
 
 def pick_trumps
-  @d.deck.first.suit
   puts "Trumps is #{@d.deck.first.suit}"
+  @d.deck.first.suit
 end
 
 def ask_player_for_trick(player)
-  list_hand(@p1)
+  list_hand(player)
 
   puts "Which trick would you like to play?"
   index_of_card_in_hand = gets.to_i
@@ -80,6 +80,7 @@ def ask_cpu_player_to_play_trick(cpu_player)
 end
 
 def ask_cpu_player_to_respond_to_trick(cpu_player)
+  list_hand(cpu_player)
   puts "CPU is thinking..."
   sleep(1)
   matching_suit = cpu_player.hand.select { |card| card.suit == @current_trick.first.suit }
@@ -111,17 +112,23 @@ def ask_cpu_player_to_respond_to_trick(cpu_player)
       play_trick(cpu_player, cpu_player.hand.index(sorted_matching_suit.first))
       round_is_won_by(@p1)
     end
-
   else
-    # The CPU must attempt to trump or discard...
+    # The CPU must attempt to trump or discard because
+    # CPU has no matching suit cards...
     puts "I have no #{@current_trick.first.suit}"
-    @trump_cards = cpu_player.hand.select { |card| card.suit == @current_trump_suit }
-    if @trump_cards.count > 0
+    trump_cards = cpu_player.hand.select { |card| card.suit == @current_trump_suit }
+    if trump_cards.count > 0
       # The CPU player has a trump card !
       puts "CPU can trump..."
+      play_trick(cpu_player, cpu_player.hand.index(trump_cards.first))
+      round_is_won_by(cpu_player)
     else
-      puts "CPU must discard..."
+      # The CPU can't play a trump.
       # Discard lowest ranking card, preferably not a trump
+      puts "CPU must discard..."
+      sort_cards = matching_suit.sort_by { |k| k.rank }
+      play_trick(cpu_player, cpu_player.hand.index(sort_cards.first))
+      round_is_won_by(@p1)
     end
   end
 end
@@ -134,6 +141,9 @@ def round_is_won_by(player)
   elsif player.number == 2
     puts "CPU won the round."
   end
+  
+  # Clear current trick
+  @current_trick.clear
 end
 
 start
