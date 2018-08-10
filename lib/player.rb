@@ -1,6 +1,7 @@
 class Player
-  def initialize
+  def initialize(number)
     @hand = []
+    @number = number
   end
 
   def set_hand(array)
@@ -9,5 +10,9 @@ class Player
 
   def hand
     @hand
+  end
+
+  def number
+    @number
   end
 end

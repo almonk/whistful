@@ -6,7 +6,7 @@ class Deck
     
     # Initialise a full deck
     while currentSuit < 4
-      i = 1
+      i = 2
       while i < 14
         c = Card.new(i, suits[currentSuit])
         @deck << c
